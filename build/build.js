@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+process.env.NODE_ENV = 'production';
 const prodconfig = require('./webpack-prod-config');
 webpack(prodconfig, (err, stats) => {
     if (err || stats.hasErrors()) {

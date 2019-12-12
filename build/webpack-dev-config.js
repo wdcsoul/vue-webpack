@@ -16,7 +16,7 @@ const config = merge(baseConfig, {
     },
     output: {
         path: path.resolve(__dirname, '../dist'),
-        filename: './js/[name].bundle.[hash].js',
+        filename: './js/[name].[hash].js',
     },
     plugins: [
         new webpack.HotModuleReplacementPlugin() // 开启css 热更新的同时，需要配置这个插件  注意，需要在package.json 中的dev 中 配置 --hot --inline     
