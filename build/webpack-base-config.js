@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin'); // 自动生成html 模板
 const VueLoaderPlugin = require('vue-loader/lib/plugin'); // vue 项目必须引入的
-const HardSourceWebpackPlugin = require('hard-source-webpack-plugin'); // 代替dll
+// const HardSourceWebpackPlugin = require('hard-source-webpack-plugin'); // 代替dll
 console.log(process.env.NODE_ENV);
 let projectName = '';
 if (process.env.NODE_ENV === 'development') {
@@ -45,12 +45,15 @@ const config = {
         new VueLoaderPlugin(),
         // 将第三方库提前打包,并且注入到html当中
         new webpack.optimize.SplitChunksPlugin(), // 提取公共代码，webpack 默认配置，也可以自己配置
-        new HardSourceWebpackPlugin()
+        // new HardSourceWebpackPlugin()
     ],
     resolve: {
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
             '@': path.resolve(__dirname, '../src'),
+            'mtapp-ui': path.resolve(__dirname, '../coreLibs/mtapp-ui.min.js'),
+            'mtapp-core': path.resolve(__dirname, '../coreLibs/mtapp-core.min.js'),
+            'mtapp-wftask': path.resolve(__dirname, '../coreLibs/mtapp-wftask-min.js')
         },
         // extensions 属性是一个数组。这样配置之后，我们在 JavaScript 文件中 import JavaScript 文件、json 文件和 Vue 单文件组件都可以省略后缀。
         extensions: ['*', '.js', '.json', '.vue'],
