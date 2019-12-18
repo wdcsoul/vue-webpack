@@ -1,0 +1,6 @@
+{
+    "window.serverURLbase": "http://111.20.112.66:8081/mtex/webapp",
+    "window.mtappConfig": {
+        "cryptoType": "aes"
+    }
+}

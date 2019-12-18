@@ -2,17 +2,22 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin'); // 自动生成html 模板
 const VueLoaderPlugin = require('vue-loader/lib/plugin'); // vue 项目必须引入的
+const { readJSONSync } = require('fs-extra');
 // const HardSourceWebpackPlugin = require('hard-source-webpack-plugin'); // 代替dll
-console.log(process.env.NODE_ENV);
 let projectName = '';
+let serverName = '';
 if (process.env.NODE_ENV === 'development') {
     projectName = process.argv[3];
-} else {
+    serverName = process.argv[5];
+} else if (process.env.NODE_ENV === 'production') {
     projectName = process.argv[2];
+    serverName = process.argv[3];
 }
+console.log(projectName + '++++++++++++++++++++++++');
+console.log(serverName + '++++++++++++++++++++++++');
 const pageConfig = require(`./config/${projectName}.config`);
-const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
-const smp = new SpeedMeasurePlugin();
+const serverConfig = path.resolve(__dirname, `./serverurl/${projectName}/${serverName}.json`);
+const jsonObj = readJSONSync(serverConfig);
 const { entry, htmlTemple } = pageConfig
 const config = {
     entry: entry,
@@ -36,15 +41,31 @@ const config = {
                 loader: 'vue-loader'
             },
             {
-                test: /\.css$/,
-                use: ['vue-style-loader', 'css-loader', 'postcss-loader', 'less-loader']
+                test: /\.(css|less)$/,
+                use: [
+                    'vue-style-loader',
+                    'css-loader',
+                    'postcss-loader',
+                    'less-loader', {
+                        loader: 'style-resources-loader',
+                        options: {
+                            patterns: [
+                                path.resolve(__dirname, '../src/assets/css/components-variates.less')
+                            ]
+                        }
+                    }]
             }
         ]
     },
     plugins: [
         new VueLoaderPlugin(),
         // 将第三方库提前打包,并且注入到html当中
-        new webpack.optimize.SplitChunksPlugin(), // 提取公共代码，webpack 默认配置，也可以自己配置
+        new webpack.HashedModuleIdsPlugin(),   // 修改webpack的默认的id 将id 修改为名称
+
+        // webpack 在编译的时候设置全局常量 
+        new webpack.DefinePlugin({
+            serverURLbase: JSON.stringify('http://111.20.112.66:8081/mtex/webapp')
+        })
         // new HardSourceWebpackPlugin()
     ],
     resolve: {
@@ -60,4 +81,4 @@ const config = {
     }
 }
 htmlTemple.forEach(ele => config.plugins.push(new HtmlWebpackPlugin(ele)));
-module.exports = smp.wrap(config);
+module.exports = config;

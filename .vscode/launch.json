@@ -11,7 +11,13 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\build\\webpack-prod-config.js"
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "debug"
+            ],
+            "port": 5858 //这个端口是调试的端口，不是项目启动的端口
+            // "program": "${workspaceFolder}/build/dev.js"
         }
     ]
 }

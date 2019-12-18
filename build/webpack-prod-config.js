@@ -5,11 +5,15 @@ const path = require('path');
 const baseConfig = require('./webpack-base-config');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // 提取公共的css
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin'); // 压缩css
+const TerserPlugin = require("terser-webpack-plugin");  // 压缩js代码
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;  // webpack 打包分析
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+const smp = new SpeedMeasurePlugin();
 const seen = new Set();
 const nameLength = 4;
 const projectName = process.argv[2];
-module.exports = merge(baseConfig, {
+console.log(__dirname);
+module.exports = smp.wrap(merge(baseConfig, {
     mode: 'production',
     // devtool: 'source-map',  // 用于生成.map 文件
     output: {
@@ -39,21 +43,35 @@ module.exports = merge(baseConfig, {
             } else {
                 return `${projectName}/${modules[0].id}`;
             }
-        })
+        }),
     ],
     // 代码分割
     optimization: {
+        minimize: true,  // 是否开启webpack压缩
         splitChunks: {
             chunks: 'all',
             cacheGroups: {
                 libs: {
                     name: "chunk-libs",
-                    test: /[\\/]node_modules[\\/]/,
+                    test: /node_modules|lib/,
                     priority: 10,
-                    chunks: "initial" // 只打包初始时依赖的第三方 例如 vue vuex vue-router core-js 
-                }
+                    chunks: "all" // 抽取项目中依赖的公共包，例如vue vuex vue-router
+                },
             }
         },
-        minimizer: [new OptimizeCssAssetsPlugin()]
-    }
-});
+        minimizer: [
+            new TerserPlugin({
+                parallel: require('os').cpus().length * 2,
+                extractComments: false,
+                cache: false,
+                terserOptions: {
+                    compress: {
+                        drop_console: true, // true 标识删除所有log
+                        drop_debugger: true,
+                    },
+                }
+            }),
+            new OptimizeCssAssetsPlugin()
+        ]
+    },
+}));

@@ -15,7 +15,7 @@ export default new Router({
                 keepalive: true,
                 title: 'home'
             },
-            component: () => import('../component/main/home.vue').catch(err => { console.error('视图加载错误：' + err); })
+            component: () => import('../component/main/home.vue')
         }
     ]
 });

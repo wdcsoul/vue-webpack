@@ -39,7 +39,7 @@ const getHtmlConfig = ({
             </html>`
         },
         filename: `./${chunkName}.html`,
-        chunks: [chunkName],
+        chunks: [chunkName, 'chunk-libs'],
         title: title,
         ...htmlConfigCommon
     }
